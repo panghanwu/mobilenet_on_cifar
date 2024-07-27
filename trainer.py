@@ -1,12 +1,13 @@
 import csv
 import logging
 from collections import defaultdict
+from copy import deepcopy
 from pathlib import Path
 from typing import Callable, Literal, Optional
 
 import torch
 from torch import Tensor
-from torch.nn import Module, Conv2d
+from torch.nn import Conv2d, Module
 from torch.optim import Optimizer
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
@@ -150,7 +151,7 @@ class Trainer:
         self.ckpt_handler = CheckpointHandler(stopping_patience, self.root / 'checkpoints')
         self._reset_epoch_log_keeper()
 
-        self.calc_weight_delta = WeightDeltaCalculator(self.model.backbone.cpu())
+        self.calc_weight_delta = WeightDeltaCalculator(deepcopy(self.model.backbone).cpu())
 
     @staticmethod
     def init_tensorboard(logdir: Path):
@@ -298,7 +299,7 @@ class Trainer:
             }
             early_stopping = self.ckpt_handler(self.epoch_logs['accuracy']['val'], 
                                                self.epoch_i, checkpoint, prefer_lower=False)
-            self.update_weight_delta_measurement(self.model.backbone.cpu())
+            self.update_weight_delta_measurement(deepcopy(self.model.backbone).cpu())
             self.finish_epoch()
             if early_stopping:
                 logging.info(f'Early stopping at epoch {self.epoch_i}.')
