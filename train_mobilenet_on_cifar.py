@@ -14,7 +14,7 @@ DROPOUT: float = 0.1
 DEBUGGING = True
 
 init_logging_configs(DEBUGGING)
-model = create_mobilenet_for_cifar(num_classes=10, configs=MOBILENET_LARGE_CONFIG)
+model = create_mobilenet_for_cifar(num_classes=100, configs=MOBILENET_LARGE_CONFIG)
 optimizer = SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=0.0001)
 train_loader, test_loader = get_cifar100_datasets(BATCH_SIZE, DATASET_DIR)
 
