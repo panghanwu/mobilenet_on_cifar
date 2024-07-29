@@ -1,8 +1,8 @@
 from torch import nn
 from torch.optim import SGD
 
-from cifars import get_cifar10_datasets
-from mobilenet import create_mobilenet_for_cifar
+from cifars import get_cifar100_datasets
+from mobilenet import create_mobilenet_for_cifar, MOBILENET_LARGE_CONFIG, MOBILENET_LARGE_VTAPER_CONFIG
 from trainer import Trainer
 from utils import init_logging_configs
 
@@ -14,9 +14,9 @@ DROPOUT: float = 0.1
 DEBUGGING = True
 
 init_logging_configs(DEBUGGING)
-model = create_mobilenet_for_cifar(num_classes=10)
+model = create_mobilenet_for_cifar(num_classes=10, configs=MOBILENET_LARGE_CONFIG)
 optimizer = SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=0.0001)
-train_loader, test_loader = get_cifar10_datasets(BATCH_SIZE, DATASET_DIR)
+train_loader, test_loader = get_cifar100_datasets(BATCH_SIZE, DATASET_DIR)
 
 trainer = Trainer(
     model,

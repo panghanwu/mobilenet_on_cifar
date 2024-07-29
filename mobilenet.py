@@ -1,7 +1,6 @@
 from collections import OrderedDict
 from dataclasses import dataclass, asdict
 from typing import Literal
-from copy import deepcopy
 
 import torch
 from torch import nn, Tensor
@@ -20,9 +19,9 @@ class MobileNetConfig:
 
 MOBILENET_LARGE_CONFIG = [
     MobileNetConfig(16, 16, 16, 3, 1, 0, 'ReLU'), 
-    MobileNetConfig(16, 64, 24, 3, 2, 0, 'ReLU'), 
+    MobileNetConfig(16, 64, 24, 3, 1, 0, 'ReLU'), 
     MobileNetConfig(24, 72, 24, 3, 1, 0, 'ReLU'), 
-    MobileNetConfig(24, 72, 40, 5, 2, 0.25, 'ReLU'), 
+    MobileNetConfig(24, 72, 40, 5, 1, 0.25, 'ReLU'), 
     MobileNetConfig(40, 120, 40, 5, 1, 0.25, 'ReLU'), 
     MobileNetConfig(40, 120, 40, 5, 1, 0.25, 'ReLU'), 
     MobileNetConfig(40, 240, 80, 3, 2, 0, 'Hardswish'), 
@@ -34,6 +33,23 @@ MOBILENET_LARGE_CONFIG = [
     MobileNetConfig(112, 672, 160, 5, 2, 0.25, 'Hardswish'), 
     MobileNetConfig(160, 960, 160, 5, 1, 0.25, 'Hardswish'), 
     MobileNetConfig(160, 960, 160, 5, 1, 0.25, 'Hardswish'), 
+]
+
+MOBILENET_LARGE_VTAPER_CONFIG = [
+    MobileNetConfig(256, 960, 256, 3, 1, 0, 'ReLU'), 
+    MobileNetConfig(256, 960, 256, 3, 1, 0, 'ReLU'), 
+    MobileNetConfig(256, 480, 192, 3, 1, 0, 'ReLU'), 
+    MobileNetConfig(192, 480, 192, 5, 1, 0.25, 'ReLU'), 
+    MobileNetConfig(192, 480, 192, 5, 1, 0.25, 'ReLU'), 
+    MobileNetConfig(192, 480, 160, 5, 1, 0.25, 'ReLU'), 
+    MobileNetConfig(160, 320, 160, 3, 2, 0, 'Hardswish'), 
+    MobileNetConfig(160, 320, 160, 3, 1, 0, 'Hardswish'), 
+    MobileNetConfig(160, 320, 160, 3, 1, 0, 'Hardswish'), 
+    MobileNetConfig(160, 320, 128, 3, 1, 0, 'Hardswish'), 
+    MobileNetConfig(128, 256, 128, 3, 1, 0.25, 'Hardswish'), 
+    MobileNetConfig(128, 256, 128, 5, 2, 0.25, 'Hardswish'), 
+    MobileNetConfig(128, 256, 128, 5, 1, 0.25, 'Hardswish'), 
+    MobileNetConfig(128, 256, 128, 5, 1, 0.25, 'Hardswish'), 
 ]
 
 def make_divisible(num: int, divider: int = 8):
@@ -200,8 +216,5 @@ class MobileNetForClassification(MobileNet):
         x = self.head(x)
         return x
 
-def create_mobilenet_for_cifar(num_classes: int, dropout: float = 0.1) -> MobileNet:
-    cfgs = deepcopy(MOBILENET_LARGE_CONFIG)
-    cfgs[1].stride = 1
-    cfgs[3].stride = 1
-    return MobileNetForClassification(cfgs, num_classes, dropout=dropout)
+def create_mobilenet_for_cifar(num_classes: int, dropout: float = 0.1, configs: list[MobileNetConfig] = MOBILENET_LARGE_CONFIG) -> MobileNet:
+    return MobileNetForClassification(configs, num_classes, dropout=dropout)
